@@ -4,3 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+dbgprint = "0.1.0"
+iter_tools = "0.24.0"
+rand = "0.9.0-beta.1"
