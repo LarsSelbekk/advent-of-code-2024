@@ -10,7 +10,6 @@ pub fn solve(input: &str) -> u32 {
                 .split(' ')
                 .map(|v| v.parse::<i32>().unwrap())
                 .multipeek();
-            // 0, 4, 2
             let first_4 = [
                 *readings.peek().unwrap(),
                 *readings.peek().unwrap(),
