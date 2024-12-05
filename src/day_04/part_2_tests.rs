@@ -1,0 +1,15 @@
+use crate::day_04::part_2::solve;
+
+#[test]
+fn sample() {
+    assert_eq!(solve("MMMSXXMASM
+MSAMXMSMSA
+AMXSXMAAMM
+MSAMASMSMX
+XMASAMXAMM
+XXAMMXXAMA
+SMSMSASXSS
+SAXAMASAAA
+MAMMMXMMMM
+MXMXAXMASX"), 9)
+}

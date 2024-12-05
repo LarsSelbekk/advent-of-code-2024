@@ -9,6 +9,7 @@ pub fn solve(input: &str) -> u32 {
         .sum()
 }
 
+#[allow(dead_code)]
 pub fn print_answer() {
     println!("{}", solve(include_str!("input.txt")));
 }

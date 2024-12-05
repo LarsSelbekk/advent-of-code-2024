@@ -6,5 +6,6 @@ edition = "2021"
 [dependencies]
 dbgprint = "0.1.0"
 iter_tools = "0.24.0"
+ndarray = "0.16.1"
 rand = "0.9.0-beta.1"
 regex = "1.11.1"
