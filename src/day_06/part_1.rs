@@ -4,6 +4,7 @@ use std::collections::HashSet;
 use std::fmt::{Display, Formatter, Write};
 use std::ops::Add;
 
+#[derive(Copy, Clone)]
 pub enum Square {
     Obstacle,
     Clear,
