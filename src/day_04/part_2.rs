@@ -31,7 +31,7 @@ struct LineDesc {
     step: (i32, i32),
 }
 
-pub fn all_diagonal_lines() -> impl Iterator<Item = LineDesc> {
+fn all_diagonal_lines() -> impl Iterator<Item = LineDesc> {
     const DIM: i32 = 3;
     (-1..=1)
         .step_by(2)
@@ -73,6 +73,7 @@ fn is_line_match(
     xmas.is_match(&s)
 }
 
+#[allow(unused)]
 pub(crate) fn print_answer() {
     println!("{}", solve(include_str!("input.txt")));
 }

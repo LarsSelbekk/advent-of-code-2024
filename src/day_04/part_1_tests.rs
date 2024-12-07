@@ -35,7 +35,7 @@ fn test_regex() {
 
 #[test]
 fn test_matrix() {
-    let matrix = Array2::<char>::from_shape_vec(
+    let _matrix = Array2::<char>::from_shape_vec(
         (140, 140),
         include_str!("input.txt")
             .lines()

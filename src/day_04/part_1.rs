@@ -74,6 +74,7 @@ fn sum_over_line(
     xmas.find_iter(&s).count() as u32
 }
 
+#[allow(unused)]
 pub fn print_answer() {
     println!("{}", solve(include_str!("input.txt")));
 }
