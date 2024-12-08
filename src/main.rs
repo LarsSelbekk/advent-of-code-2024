@@ -7,5 +7,5 @@ mod day_06;
 mod day_07;
 
 fn main() {
-    day_06::part_2::print_answer();
+    day_07::part_2::print_answer();
 }

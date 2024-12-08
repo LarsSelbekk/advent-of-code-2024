@@ -1,8 +1,9 @@
 use iter_tools::Itertools;
+use rayon::prelude::*;
 
 pub fn solve(input: &str) -> usize {
     input
-        .lines()
+        .par_lines()
         .filter_map(|line| {
             let (desired_result, operands) = line.split_once(": ").unwrap();
             let desired_result = desired_result.parse::<usize>().unwrap();
@@ -11,19 +12,21 @@ pub fn solve(input: &str) -> usize {
                 .map(|arg| arg.parse::<usize>().unwrap())
                 .collect_vec();
 
-            let is_solvable = (0..3_u32.pow((operands.len() - 1) as u32)).any(|tritmap| {
-                let mut operands_iter = operands.iter();
-                let mut computed = *operands_iter.next().unwrap();
-                for (operand_index, arg) in operands_iter.enumerate() {
-                    match get_trit(tritmap, operand_index) {
-                        0 => computed += arg,
-                        1 => computed *= arg,
-                        2 => computed = concat(computed, *arg),
-                        _ => unreachable!(),
+            let is_solvable = (0..3_u32.pow((operands.len() - 1) as u32))
+                .into_par_iter()
+                .any(|tritmap| {
+                    let mut operands_iter = operands.iter();
+                    let mut computed = *operands_iter.next().unwrap();
+                    for (operand_index, arg) in operands_iter.enumerate() {
+                        match get_trit(tritmap, operand_index) {
+                            0 => computed += arg,
+                            1 => computed *= arg,
+                            2 => computed = concat(computed, *arg),
+                            _ => unreachable!(),
+                        }
                     }
-                }
-                computed == desired_result
-            });
+                    computed == desired_result
+                });
             if is_solvable {
                 Some(desired_result)
             } else {
