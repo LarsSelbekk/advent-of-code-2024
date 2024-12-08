@@ -13,12 +13,13 @@ pub enum Square {
 impl Display for Square {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Square::Obstacle => f.write_char('#'),
-            Square::Clear => f.write_char('.'),
+            Square::Obstacle => f.write_char('\u{2593}'),
+            Square::Clear => f.write_char('\u{2022}'),
         }
     }
 }
 
+#[allow(unused)]
 pub fn solve(input: &str) -> u32 {
     let dim = input.find('\n').unwrap();
 
@@ -73,12 +74,12 @@ pub(crate) fn parse_map(input: &str, dim: usize) -> Array2<Square> {
     map
 }
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Ord, Eq, PartialOrd)]
 pub(crate) enum Direction {
     Up,
+    Right,
     Down,
     Left,
-    Right,
 }
 
 impl Direction {
