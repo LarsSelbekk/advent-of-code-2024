@@ -71,6 +71,7 @@ pub fn get_trit(i: u32, trit_index: usize) -> u32 {
         / 3_u32.pow(trit_index as _)
 }
 
+#[allow(unused)]
 pub fn print_answer() {
     println!("{}", solve(include_str!("input.txt")));
 }

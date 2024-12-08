@@ -128,6 +128,7 @@ fn print_map(
     )
 }
 
+#[allow(unused)]
 pub fn print_answer() {
     println!("{}", solve(include_str!("input.txt")))
 }

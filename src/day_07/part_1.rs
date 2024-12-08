@@ -23,6 +23,7 @@ pub fn solve(input: &str) -> usize {
     }).sum()
 }
 
+#[allow(unused)]
 pub fn print_answer() {
     println!("{}", solve(include_str!("input.txt")));
 }
