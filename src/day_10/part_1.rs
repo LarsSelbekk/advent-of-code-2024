@@ -10,18 +10,18 @@ use std::io::Write;
 use wyhash2::WyHash;
 
 pub fn solve(input: &str) -> usize {
-    let (graph, zeros, _) = parse_graph(input);
+    let (graph, _, nines) = parse_graph(input, false);
 
     let mut trailheads_reaching: HashMap<_, HashSet<_, WyHash>, _> =
-        HashMap::with_capacity_and_hasher(zeros.len(), WyHash::default());
-    for zero in zeros.iter().copied() {
-        trailheads_reaching.insert(zero, [zero].iter().copied().collect());
+        HashMap::with_capacity_and_hasher(nines.len(), WyHash::default());
+    for nine in nines.iter().copied() {
+        trailheads_reaching.insert(nine, [nine].iter().copied().collect());
     }
-    let mut visited_this_generation: HashSet<_, WyHash> = HashSet::from_iter(zeros.iter().copied());
+    let mut visited_this_generation: HashSet<_, WyHash> = HashSet::from_iter(nines.iter().copied());
 
-    debug_save_graph_with_reaching(&graph, &trailheads_reaching, &0);
+    debug_save_graph_with_reaching(&graph, &trailheads_reaching, &9);
 
-    for generation in 1..=9 {
+    for generation in (0..=8).rev() {
         let visited_previous_generation = visited_this_generation;
         visited_this_generation = Default::default();
 
@@ -44,10 +44,8 @@ pub fn solve(input: &str) -> usize {
 
     visited_this_generation
         .into_iter()
-        .flat_map(|nine_index| trailheads_reaching[&nine_index].iter())
-        .counts()
-    .values()
-    .sum()
+        .map(|zero_index| trailheads_reaching[&zero_index].len())
+        .sum()
 }
 
 fn debug_save_graph_with_reaching(
@@ -69,7 +67,10 @@ fn debug_save_graph_with_reaching(
     }
 }
 
-pub fn parse_graph(input: &str) -> (Graph<usize, ()>, Vec<NodeIndex>, Vec<NodeIndex>) {
+pub fn parse_graph(
+    input: &str,
+    reverse: bool,
+) -> (Graph<usize, ()>, Vec<NodeIndex>, Vec<NodeIndex>) {
     let dim = input.find('\n').unwrap();
     let mut nines = vec![];
     let mut zeros = vec![];
@@ -101,7 +102,11 @@ pub fn parse_graph(input: &str) -> (Graph<usize, ()>, Vec<NodeIndex>, Vec<NodeIn
             let neighbor_pos = (pos.0.wrapping_add_signed(dy), pos.1.wrapping_add_signed(dx));
             if let Some(neighbor_digit) = map.get(neighbor_pos) {
                 if *neighbor_digit == digit + 1 {
-                    graph.add_edge(indices[pos], indices[neighbor_pos], ());
+                    if reverse {
+                        graph.add_edge(indices[pos], indices[neighbor_pos], ());
+                    } else {
+                        graph.add_edge(indices[neighbor_pos], indices[pos], ());
+                    }
                 }
             }
         }

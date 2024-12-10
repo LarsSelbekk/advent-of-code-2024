@@ -2,7 +2,7 @@ use crate::day_10::part_1::parse_graph;
 use iter_tools::Itertools;
 
 pub fn solve(input: &str) -> usize {
-    let (graph, zeros, nines) = parse_graph(input);
+    let (graph, zeros, nines) = parse_graph(input, true);
     zeros
         .iter()
         .cartesian_product(nines.iter())
