@@ -10,5 +10,5 @@ mod day_09;
 mod day_10;
 
 fn main() {
-    day_10::part_2::print_answer();
+    day_10::part_1::print_answer();
 }

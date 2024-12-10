@@ -1,24 +1,72 @@
 use iter_tools::Itertools;
 use ndarray::Array2;
-use petgraph::algo::floyd_warshall;
 use petgraph::dot::Dot;
 use petgraph::graph::DiGraph;
 use petgraph::prelude::*;
+use petgraph::visit::{IntoNeighborsDirected, Walker};
+use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::Write;
+use wyhash2::WyHash;
 
 pub fn solve(input: &str) -> usize {
-    let (graph, zeros, nines) = parse_graph(input);
+    let (graph, zeros, _) = parse_graph(input);
 
-    // Takes 20s on main input
-    // TODO: gradually expanding graphs from all zeros and all nines, meet in middle?
-    let distances = floyd_warshall(&graph, |_| 1).unwrap();
-    zeros
-        .iter()
-        .copied()
-        .cartesian_product(nines.iter().copied())
-        .filter(|zero_nine_pair| distances[zero_nine_pair] != usize::MAX)
-        .count()
+    let mut trailheads_reaching: HashMap<_, HashSet<_, WyHash>, _> =
+        HashMap::with_capacity_and_hasher(zeros.len(), WyHash::default());
+    for zero in zeros.iter().copied() {
+        trailheads_reaching.insert(zero, [zero].iter().copied().collect());
+    }
+    let mut visited_this_generation: HashSet<_, WyHash> = HashSet::from_iter(zeros.iter().copied());
+
+    debug_save_graph_with_reaching(&graph, &trailheads_reaching, &0);
+
+    for generation in 1..=9 {
+        let visited_previous_generation = visited_this_generation;
+        visited_this_generation = Default::default();
+
+        for source in visited_previous_generation {
+            for neighbor in graph.neighbors_directed(source, Outgoing) {
+                if graph[neighbor] == generation {
+                    visited_this_generation.insert(neighbor);
+                    let this_trailheads =
+                        trailheads_reaching[&source].iter().copied().collect_vec();
+                    trailheads_reaching
+                        .entry(neighbor)
+                        .or_default()
+                        .extend(this_trailheads);
+                }
+            }
+        }
+
+        debug_save_graph_with_reaching(&graph, &trailheads_reaching, &generation);
+    }
+
+    visited_this_generation
+        .into_iter()
+        .flat_map(|nine_index| trailheads_reaching[&nine_index].iter())
+        .counts()
+    .values()
+    .sum()
+}
+
+fn debug_save_graph_with_reaching(
+    graph: &Graph<usize, ()>,
+    trailheads_reaching: &HashMap<NodeIndex, HashSet<NodeIndex, WyHash>, WyHash>,
+    generation: &usize,
+) {
+    #[cfg(debug_assertions)]
+    {
+        let mut g2 = graph.clone();
+        for (i, n) in g2.node_weights_mut().enumerate() {
+            *n = *n * 10000
+                + trailheads_reaching
+                    .get(&NodeIndex::new(i))
+                    .map(|h| h.len())
+                    .unwrap_or_default();
+        }
+        debug_save_graph(&g2, &format!("gen_{generation}"));
+    }
 }
 
 pub fn parse_graph(input: &str) -> (Graph<usize, ()>, Vec<NodeIndex>, Vec<NodeIndex>) {
@@ -59,15 +107,22 @@ pub fn parse_graph(input: &str) -> (Graph<usize, ()>, Vec<NodeIndex>, Vec<NodeIn
         }
     }
 
+    debug_save_graph(&graph, "init");
+
+    (graph, zeros, nines)
+}
+
+fn debug_save_graph(graph: &Graph<usize, ()>, suffix: &str) {
     #[cfg(debug_assertions)]
     writeln!(
-        File::create("graph.dot").unwrap(),
+        File::create(
+            file!().rsplit_once('/').unwrap().0.to_owned() + &format!("/graphs/graph_{suffix}.dot")
+        )
+        .unwrap(),
         "{:?}",
         Dot::with_config(&graph, &[petgraph::dot::Config::EdgeNoLabel])
     )
     .unwrap();
-
-    (graph, zeros, nines)
 }
 
 #[allow(unused)]

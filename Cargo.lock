@@ -14,6 +14,7 @@ dependencies = [
  "rand",
  "rayon",
  "regex",
+ "wyhash2",
 ]
 
 [[package]]
@@ -228,6 +229,12 @@ dependencies = [
  "portable-atomic-util",
  "rawpointer",
 ]
+
+[[package]]
+name = "no-std-compat"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b93853da6d84c2e3c7d730d6473e8817692dd89be387eb01b94d7f108ecb5b8c"
 
 [[package]]
 name = "num-complex"
@@ -583,6 +590,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3268f3d866458b787f390cf61f4bbb563b922d091359f9608842999eaee3943c"
 dependencies = [
  "bitflags",
+]
+
+[[package]]
+name = "wyhash2"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9433c7c86e328a8197038c9fc31f6e5c81f9c7bdc087d86e266680236af1af1b"
+dependencies = [
+ "no-std-compat",
 ]
 
 [[package]]
