@@ -3,7 +3,6 @@ use ndarray::Array2;
 use petgraph::dot::Dot;
 use petgraph::graph::DiGraph;
 use petgraph::prelude::*;
-use petgraph::visit::{IntoNeighborsDirected, Walker};
 use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::Write;
