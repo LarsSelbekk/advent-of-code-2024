@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+colored = "2.1.0"
 dbgprint = "0.1.0"
 iter_tools = "0.24.0"
 ndarray = "0.16.1"
