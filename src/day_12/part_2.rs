@@ -4,11 +4,12 @@ use colored::{ColoredString, Colorize};
 use iter_tools::{repeat_n, Itertools};
 use ndarray::{Array2, Axis};
 use std::collections::{HashMap, HashSet};
+use wyhash2::WyHash;
 
 pub fn solve(input: &str) -> usize {
     let (map, dim) = part_1::parse_map(input);
     let zones = part_1::create_zones(&map);
-    let mut perimeters = HashMap::<usize, usize>::new();
+    let mut perimeters = HashMap::<usize, usize, _>::with_hasher(WyHash::default());
 
     part_1::print_map(&map, &zones);
     print_zones(&map, &zones);
@@ -63,8 +64,8 @@ pub fn solve(input: &str) -> usize {
 
 fn print_zone_costs(
     map: &Array2<char>,
-    zones: &Vec<HashSet<(usize, usize)>>,
-    perimeters: &mut HashMap<usize, usize>,
+    zones: &Vec<HashSet<(usize, usize), WyHash>>,
+    perimeters: &mut HashMap<usize, usize, WyHash>,
 ) {
     #[cfg(not(debug_assertions))]
     return;
@@ -81,7 +82,7 @@ fn print_zone_costs(
     }
 }
 
-fn print_zones(map: &Array2<char>, zones: &Vec<HashSet<(usize, usize)>>) {
+fn print_zones(map: &Array2<char>, zones: &Vec<HashSet<(usize, usize), WyHash>>) {
     #[cfg(debug_assertions)]
     eprintln!(
         "{}",
@@ -94,7 +95,7 @@ fn print_zones(map: &Array2<char>, zones: &Vec<HashSet<(usize, usize)>>) {
 fn print_step(
     step: impl Iterator<Item = (usize, Option<usize>)>,
     map: &Array2<char>,
-    zones: &Vec<HashSet<(usize, usize)>>,
+    zones: &Vec<HashSet<(usize, usize), WyHash>>,
 ) {
     #[cfg(not(debug_assertions))]
     return;
@@ -120,14 +121,14 @@ fn print_step(
     );
 }
 
-fn add_counts(into: &mut HashMap<usize, usize>, to_add: &HashMap<usize, usize>) {
+fn add_counts(into: &mut HashMap<usize, usize, WyHash>, to_add: &HashMap<usize, usize, WyHash>) {
     for (key, value) in to_add {
         *into.entry(*key).or_insert(0) += value;
     }
 }
 
-fn count_edges(step: impl Iterator<Item = (usize, Option<usize>)>) -> HashMap<usize, usize> {
-    let mut perimeters = HashMap::new();
+fn count_edges(step: impl Iterator<Item = (usize, Option<usize>)>) -> HashMap<usize, usize, WyHash> {
+    let mut perimeters = HashMap::with_hasher(WyHash::default());
     let mut previous = None;
 
     let counts = step
@@ -151,8 +152,8 @@ fn count_edges(step: impl Iterator<Item = (usize, Option<usize>)>) -> HashMap<us
 }
 
 fn print_perimeters(
-    perimeters: &HashMap<usize, usize>,
-    zones: &Vec<HashSet<(usize, usize)>>,
+    perimeters: &HashMap<usize, usize, WyHash>,
+    zones: &Vec<HashSet<(usize, usize), WyHash>>,
     map: &Array2<char>,
 ) {
     #[cfg(not(debug_assertions))]
@@ -172,7 +173,7 @@ fn print_perimeters(
 fn get_zone_name(
     zone_index: &usize,
     map: &Array2<char>,
-    zones: &Vec<HashSet<(usize, usize)>>,
+    zones: &Vec<HashSet<(usize, usize), WyHash>>,
 ) -> ColoredString {
     let representative = *zones[*zone_index].iter().next().unwrap();
     let char = map[representative];

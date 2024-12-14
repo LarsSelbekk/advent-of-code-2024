@@ -2,6 +2,7 @@ use colored::{ColoredString, Colorize};
 use iter_tools::Itertools;
 use ndarray::Array2;
 use std::collections::HashSet;
+use wyhash2::WyHash;
 
 pub fn solve(input: &str) -> usize {
     let (map, _) = parse_map(input);
@@ -11,8 +12,8 @@ pub fn solve(input: &str) -> usize {
     calculate_price(&zones)
 }
 
-pub fn create_zones(map: &Array2<char>) -> Vec<HashSet<(usize, usize)>> {
-    let mut zones: Vec<HashSet<(usize, usize)>> = vec![];
+pub fn create_zones(map: &Array2<char>) -> Vec<HashSet<(usize, usize), WyHash>> {
+    let mut zones: Vec<HashSet<(usize, usize), WyHash>> = vec![];
 
     for ((y, x), c) in map.indexed_iter() {
         let [up_pos, left_pos] = [(-1, 0), (0, -1)]
@@ -40,21 +41,24 @@ pub fn create_zones(map: &Array2<char>) -> Vec<HashSet<(usize, usize)>> {
                 zones[i].insert((y, x));
             }
             (None, None) => {
-                zones.push(HashSet::from([(y, x)]));
+                zones.push(HashSet::from_iter([(y, x)]));
             }
         }
     }
     zones
 }
 
-pub fn get_zone_index(zones: &Vec<HashSet<(usize, usize)>>, pos: &(usize, usize)) -> Option<usize> {
+pub fn get_zone_index(
+    zones: &Vec<HashSet<(usize, usize), WyHash>>,
+    pos: &(usize, usize),
+) -> Option<usize> {
     zones
         .iter()
         .find_position(|g| g.contains(&pos))
         .map(|(i, _)| i)
 }
 
-fn calculate_price(zones: &Vec<HashSet<(usize, usize)>>) -> usize {
+fn calculate_price(zones: &Vec<HashSet<(usize, usize), WyHash>>) -> usize {
     zones
         .iter()
         .map(|zone| {
@@ -88,7 +92,7 @@ pub fn parse_map(input: &str) -> (Array2<char>, usize) {
     )
 }
 
-pub fn print_map(map: &Array2<char>, zones: &Vec<HashSet<(usize, usize)>>) {
+pub fn print_map(map: &Array2<char>, zones: &Vec<HashSet<(usize, usize), WyHash>>) {
     #[cfg(not(debug_assertions))]
     return;
 
@@ -106,7 +110,7 @@ pub fn print_map(map: &Array2<char>, zones: &Vec<HashSet<(usize, usize)>>) {
 pub fn format_zone(
     char: &char,
     pos: (usize, usize),
-    zones: &Vec<HashSet<(usize, usize)>>,
+    zones: &Vec<HashSet<(usize, usize), WyHash>>,
 ) -> ColoredString {
     let s = char.to_string();
     if let Some((zone_id, _)) = zones.iter().find_position(|zone| zone.contains(&pos)) {
