@@ -4,18 +4,14 @@ use ndarray::Array2;
 use std::collections::HashSet;
 
 pub fn solve(input: &str) -> usize {
-    #[cfg(debug_assertions)]
-    eprintln!("{}", input);
-
     let (map, _) = parse_map(input);
     let zones = create_zones(&map);
-
     print_map(&map, &zones);
 
     calculate_price(&zones)
 }
 
-pub(crate) fn create_zones(map: &Array2<char>) -> Vec<HashSet<(usize, usize)>> {
+pub fn create_zones(map: &Array2<char>) -> Vec<HashSet<(usize, usize)>> {
     let mut zones: Vec<HashSet<(usize, usize)>> = vec![];
 
     for ((y, x), c) in map.indexed_iter() {
@@ -92,21 +88,29 @@ pub fn parse_map(input: &str) -> (Array2<char>, usize) {
     )
 }
 
-fn print_map(map: &Array2<char>, zones: &Vec<HashSet<(usize, usize)>>) {
-    #[cfg(debug_assertions)]
-    {
-        dbg!(zones.len());
-        for (i, c) in map.indexed_iter() {
-            eprint!("{}{}", if i.1 == 0 { "\n" } else { "" }, color(c, i, zones))
-        }
-        eprintln!();
+pub fn print_map(map: &Array2<char>, zones: &Vec<HashSet<(usize, usize)>>) {
+    #[cfg(not(debug_assertions))]
+    return;
+
+    dbg!(zones.len());
+    for (i, c) in map.indexed_iter() {
+        eprint!(
+            "{}{}",
+            if i.1 == 0 { "\n" } else { "" },
+            format_zone(c, i, zones)
+        )
     }
+    eprintln!();
 }
 
-fn color(c: &char, i: (usize, usize), zones: &Vec<HashSet<(usize, usize)>>) -> ColoredString {
-    let s = c.to_string();
-    if let Some((i, _)) = zones.iter().find_position(|zone| zone.contains(&i)) {
-        match i {
+pub fn format_zone(
+    char: &char,
+    pos: (usize, usize),
+    zones: &Vec<HashSet<(usize, usize)>>,
+) -> ColoredString {
+    let s = char.to_string();
+    if let Some((zone_id, _)) = zones.iter().find_position(|zone| zone.contains(&pos)) {
+        match zone_id % 23 {
             0 => s.blue(),
             1 => s.green(),
             2 => s.red(),
@@ -130,13 +134,14 @@ fn color(c: &char, i: (usize, usize), zones: &Vec<HashSet<(usize, usize)>>) -> C
             20 => s.on_magenta(),
             21 => s.on_cyan(),
             22 => s.on_purple(),
-            _ => panic!(),
+            _ => unreachable!(),
         }
     } else {
         s.bright_white()
     }
 }
 
+#[allow(unused)]
 pub fn print_answer() {
     println!("{}", solve(include_str!("input.txt")));
 }
