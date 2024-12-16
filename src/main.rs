@@ -13,7 +13,8 @@ mod day_12;
 mod day_13;
 mod day_14;
 mod day_15;
+mod day_16;
 
 fn main() {
-    day_15::part_2::print_answer();
+    day_16::part_2::print_answer();
 }

@@ -4,7 +4,7 @@ use std::collections::HashSet;
 use std::fmt::{Display, Formatter, Write};
 use std::ops::Add;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub enum Square {
     Obstacle,
     Clear,
@@ -83,7 +83,7 @@ pub(crate) enum Direction {
 }
 
 impl Direction {
-    pub(crate) fn rotate(&self) -> Self {
+    pub fn rotate(&self) -> Self {
         match *self {
             Direction::Up => Direction::Right,
             Direction::Right => Direction::Down,
