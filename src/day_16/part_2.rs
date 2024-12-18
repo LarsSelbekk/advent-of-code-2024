@@ -116,7 +116,7 @@ fn add_or_update(
         });
 }
 
-fn print_map(map: &Array2<Square>, visited: &HashSet<(usize, usize)>, cursor: Option<State>) {
+pub fn print_map(map: &Array2<Square>, visited: &HashSet<(usize, usize)>, cursor: Option<State>) {
     for (pos, square) in map.indexed_iter() {
         if pos.1 == 0 {
             println!();
